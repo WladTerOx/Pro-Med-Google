@@ -40,11 +40,12 @@ Pre-2026-08-05 commits (kept for traceability, summarized from `git log
 - `2026-08-05T21:10:00Z` — **AI-fallback migration**: `services/ai.ts` now runs a priority chain `ollama → gemini → mistral`, with per-provider availability probes (Mistral `GET /v1/models`, Gemini `generateContent('Hello')`); all four AI entry-points in `services/gemini.ts` and `services/mistral.ts` now throw on failure instead of silently returning the original input. New `ALL_AI_PROVIDERS_UNAVAILABLE` error triggers a dedicated modal in `App.tsx` reachable from both the search path and the article-view path. OpenSpec change `ai-fallback-chain-migration` archived; new main spec `openspec/specs/ai-services/spec.md` covers provider priority, availability test, throw-on-failure contract, AI-unavailable modal, and Vite `allowedHosts` allowlist. `vite.config.ts`: `allowedHosts` hardened to `['med.openaiua.cloud']`; `proxy.on('proxyRes')` lifted out of `proxy.on('proxyReq')` callback to fix listener memory leak; inbound `Origin` echoed back to Ollama. `.gitignore` now excludes `.env` and `/key/`. New fixation/tasks infrastructure (`FIXATION.md`, `.pi/skills/*`, `.pi/prompts/opsx-*.md`).
 - `2026-08-05T21:10:00Z` — Audit `002` written; remaining 7 infra items from `tasks/001–011` folded into a single `tasks/012` for the next cycle.
 - `2026-08-05T21:10:00Z` — **Bootstrap CHANGELOG** (this file).
+- `2026-08-05T21:32:00Z` — **Rotated Gemini API key** in `.env` and `key/.env.local` (secrets stay gitignored). New key passed `GET /v1beta/models` smoke-test with HTTP 200 and no `RESOURCE_EXHAUSTED`. Audit `003` and tasks `013` recorded. The key is on disk but **not yet in the production bundle** — pending `npm run build` → `dist/` sync → Docker re-create → container restart (steps 4-6 in `tasks/013`). Until then Mistral remains the de-facto working provider. Security follow-up recommended: re-issue the key via a protected channel and disable any older key on `aistudio.google.com/apikey`.
 
 ## Upcoming (planned, not yet implemented)
 
 See `summary/tasks/012-2026-08-05T21-10-00Z-fix-uncompleted-from-001-011.md`
 for the concrete backlog: favicon link in `index.html`, dev-only Ollama
 logs, `vite preview` script, `deploy.sh`, TAB-character sweep, Ollama
-host repair, Gemini prepay, hardcoded fallback removal, and the build /
-sync / Docker re-create step.
+host repair, Gemini **deploy** (new key awaits steps 4-6 of `tasks/013`),
+hardcoded fallback removal, and the build / sync / Docker re-create step.
