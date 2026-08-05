@@ -39,8 +39,12 @@ const isProviderAvailable = async (provider: AIProvider): Promise<boolean> => {
     case 'ollama':
       return await ollama.checkOllamaConnection();
     case 'gemini':
+      console.log('Testing Gemini API...');
       const geminiKeyPresent = !!import.meta.env.VITE_API_KEY;
-      if (!geminiKeyPresent) return false;
+      if (!geminiKeyPresent) {
+        console.log('Gemini API key not present');
+        return false;
+      }
       // Quick API test - try a simple generation
       try {
         const { GoogleGenAI } = await import('@google/genai');
@@ -49,8 +53,10 @@ const isProviderAvailable = async (provider: AIProvider): Promise<boolean> => {
           model: 'gemini-flash-latest',
           contents: 'Hello',
         });
+        console.log('Gemini API test result: true');
         return true;
       } catch (error: any) {
+        console.log('Gemini API test failed:', error?.message || error);
         // If quota exceeded or resource exhausted, consider unavailable
         if (error.message?.includes('RESOURCE_EXHAUSTED') ||
             error.message?.includes('quota') ||

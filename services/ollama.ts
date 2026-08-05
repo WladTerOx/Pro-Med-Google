@@ -14,14 +14,18 @@ console.log('OLLAMA_MODEL', OLLAMA_MODEL);
  * Check if Ollama is available
  */
 export const checkOllamaConnection = async (): Promise<boolean> => {
+  console.log('Testing Ollama connection...');
   try {
     // Используем прокси для обхода CORS
     const response = await fetch('/api/ollama/api/tags', {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' },
     });
-    return response.ok;
-  } catch {
+    const result = response.ok;
+    console.log('Ollama connection test result:', result);
+    return result;
+  } catch (error: any) {
+    console.log('Ollama connection test failed:', error?.message || error);
     return false;
   }
 };
