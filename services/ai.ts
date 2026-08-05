@@ -1,18 +1,27 @@
 import * as ollama from './ollama';
 import * as gemini from './gemini';
 import * as mistral from './mistral';
+import * as minimax from './minimax';
 
 /**
  * AI Service Abstraction Layer
- * Uses fallback: tries Ollama first, then Gemini, then Mistral
+ * Uses fallback: tries providers in PROVIDER_PRIORITY order.
+ *
+ * Current priority (chosen by user on 2026-08-05; unusual because it
+ * places paid Mistral first and local Ollama last; see
+ * summary/audit/004 for justification):
+ *   mistral → MiniMax → gemini → ollama
  */
 
-type AIProvider = 'ollama' | 'gemini' | 'mistral';
+type AIProvider = 'ollama' | 'gemini' | 'mistral' | 'minimax';
 
 /**
- * Priority order for AI providers: local first, then cloud
+ * Priority order for AI providers.
+ * User-selected order: mistral → MiniMax → gemini → ollama.
+ * ⚠️ This is intentionally not "local-first"; the rationale is
+ * documented in openspec/changes/MiniMax-provider-integration/design.md.
  */
-const PROVIDER_PRIORITY: AIProvider[] = ['ollama', 'gemini', 'mistral'];
+const PROVIDER_PRIORITY: AIProvider[] = ['mistral', 'minimax', 'gemini', 'ollama'];
 
 /**
  * Get the selected AI provider from localStorage
@@ -72,6 +81,29 @@ const isProviderAvailable = async (provider: AIProvider): Promise<boolean> => {
         console.log('Mistral API test failed:', error.message);
         return false;
       }
+    case 'minimax':
+      const minimaxKeyPresent = !!import.meta.env.VITE_MINIMAX_API_KEY;
+      const minimaxKeyStr = String(import.meta.env.VITE_MINIMAX_API_KEY || '');
+      if (!minimaxKeyPresent || minimaxKeyStr.trim().startsWith('MINIMAX_REPLACE_ME')) {
+        console.log('MiniMax API key is missing or still a placeholder');
+        return false;
+      }
+      // Quick API test - list available models (OpenAI-compatible endpoint)
+      try {
+        console.log('Testing MiniMax API...');
+        const response = await fetch('https://api.minimax.io/v1/models', {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${import.meta.env.VITE_MINIMAX_API_KEY}`,
+          },
+        });
+        const result = response.ok;
+        console.log('MiniMax API test result:', result);
+        return result;
+      } catch (error) {
+        console.log('MiniMax API test failed:', error.message);
+        return false;
+      }
     default:
       return false;
   }
@@ -100,6 +132,8 @@ const getUnavailableMessage = (provider: AIProvider): string => {
       return 'Gemini недоступен. Проверьте API ключ или лимит запросов.';
     case 'mistral':
       return 'Mistral недоступен. Проверьте API ключ или лимит запросов.';
+    case 'minimax':
+      return 'MiniMax недоступен. Проверьте API ключ или лимит запросов.';
     default:
       return 'Выбранный AI-провайдер недоступен.';
   }
@@ -119,6 +153,8 @@ export const translateQueryToEnglish = async (query: string): Promise<string> =>
           return gemini.translateQueryToEnglish(query);
         case 'mistral':
           return mistral.translateQueryToEnglish(query);
+        case 'minimax':
+          return minimax.translateQueryToEnglish(query);
         default:
           return query;
       }
@@ -139,6 +175,8 @@ export const translateQueryToEnglish = async (query: string): Promise<string> =>
             return gemini.translateQueryToEnglish(query);
           case 'mistral':
             return mistral.translateQueryToEnglish(query);
+          case 'minimax':
+            return minimax.translateQueryToEnglish(query);
           default:
             break;
         }
@@ -166,6 +204,8 @@ export const translateTitlesToRussian = async (titles: string[]): Promise<string
           return gemini.translateTitlesToRussian(titles);
         case 'mistral':
           return mistral.translateTitlesToRussian(titles);
+        case 'minimax':
+          return minimax.translateTitlesToRussian(titles);
         default:
           return titles;
       }
@@ -186,6 +226,8 @@ export const translateTitlesToRussian = async (titles: string[]): Promise<string
             return gemini.translateTitlesToRussian(titles);
           case 'mistral':
             return mistral.translateTitlesToRussian(titles);
+          case 'minimax':
+            return minimax.translateTitlesToRussian(titles);
           default:
             break;
         }
@@ -213,6 +255,8 @@ export const summarizeArticleForLayperson = async (title: string, abstract: stri
           return gemini.summarizeArticleForLayperson(title, abstract);
         case 'mistral':
           return mistral.summarizeArticleForLayperson(title, abstract);
+        case 'minimax':
+          return minimax.summarizeArticleForLayperson(title, abstract);
         default:
           return 'AI-провайдер не выбран.';
       }
@@ -233,6 +277,8 @@ export const summarizeArticleForLayperson = async (title: string, abstract: stri
             return gemini.summarizeArticleForLayperson(title, abstract);
           case 'mistral':
             return mistral.summarizeArticleForLayperson(title, abstract);
+          case 'minimax':
+            return minimax.summarizeArticleForLayperson(title, abstract);
           default:
             break;
         }
@@ -260,6 +306,8 @@ export const optimizeQueryForPubMed = async (longQuery: string): Promise<string>
           return gemini.optimizeQueryForPubMed(longQuery);
         case 'mistral':
           return mistral.optimizeQueryForPubMed(longQuery);
+        case 'minimax':
+          return minimax.optimizeQueryForPubMed(longQuery);
         default:
           return longQuery;
       }
@@ -280,6 +328,8 @@ export const optimizeQueryForPubMed = async (longQuery: string): Promise<string>
             return gemini.optimizeQueryForPubMed(longQuery);
           case 'mistral':
             return mistral.optimizeQueryForPubMed(longQuery);
+          case 'minimax':
+            return minimax.optimizeQueryForPubMed(longQuery);
           default:
             break;
         }

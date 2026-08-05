@@ -1,15 +1,4 @@
-# ai-services Specification
-
-## Purpose
-
-Drives the AI provider selection and fallback behavior used by every AI
-feature in the app (query translation, titles translation, query
-optimization, article summarization). Establishes a single contract that
-the rest of the application can rely on: at least one provider will be
-tried per request, in priority order; failure of the entire chain is
-surfaced to the user as an actionable error.
-
-## Requirements
+## MODIFIED Requirements
 
 ### Requirement: Provider priority chain
 
@@ -78,24 +67,6 @@ and it MUST support MiniMax identically to the other cloud providers.
 - **THEN** MiniMax is treated as unavailable and skipped without any
   network probe
 
-### Requirement: Provider operations throw on failure
-
-Each provider's `translateQueryToEnglish`, `translateTitlesToRussian`,
-`summarizeArticleForLayperson`, and `optimizeQueryForPubMed` functions
-SHALL throw an error when the operation cannot complete. The functions
-MUST NOT silently return the original input or a placeholder string.
-
-#### Scenario: Gemini 4xx during translation
-- **WHEN** `services/gemini.ts#translateQueryToEnglish` is invoked and
-  the upstream API returns a 4xx error
-- **THEN** the function throws and the orchestrator advances to the next
-  provider
-
-#### Scenario: Missing API key
-- **WHEN** a provider is called without its required API key
-- **THEN** the function throws `Error("<provider> API key is missing")`
-  instead of returning the input unprocessed
-
 ### Requirement: AI unavailable modal
 
 The application SHALL display a modal dialog when an AI operation ends in
@@ -121,6 +92,8 @@ which providers were checked before the modal opened.
 - **WHEN** the user reads the AI-unavailable modal
 - **THEN** the modal text mentions MiniMax by name in the provider list
 
+## ADDED Requirements
+
 ### Requirement: MiniMax placeholder gating
 
 The system SHALL treat a `VITE_MINIMAX_API_KEY` value that starts with
@@ -140,18 +113,3 @@ has obtained a real MiniMax API key.
   that does not start with `MINIMAX_REPLACE_ME`
 - **THEN** the next probe call reaches `https://api.minimax.io/v1/models`
   with the user's key
-
-### Requirement: Production hostname allowlist
-
-The Vite dev server SHALL only accept requests with the hostnames in an
-explicit allowlist. The allowlist MUST include `med.openaiua.cloud`.
-Wildcard `true` MUST NOT be used because it allows any Host header.
-
-#### Scenario: Production host accepted
-- **WHEN** a request to the dev server uses `Host: med.openaiua.cloud`
-- **THEN** the request is served normally
-
-#### Scenario: Foreign host rejected
-- **WHEN** a request uses `Host: attacker.example`
-- **THEN** Vite rejects the request and never proxies it through the
-  configured proxy routes

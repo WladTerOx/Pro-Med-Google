@@ -1,0 +1,62 @@
+# 014 — Интеграция провайдера MiniMax
+
+**Создан:** 2026-08-05 21:46 UTC
+**Приоритет:** 🟡 средний
+**Связано с:** [audit/004](../audit/004-2026-08-05T21-46-00Z-add-MiniMax-provider-integration.md),
+[audit/002](../audit/002-2026-08-05T21-10-00Z-all-fixes-and-ai-fallback-migration.md),
+OpenSpec change `MiniMax-provider-integration` (archived).
+
+## Статус: 🟡 Pending real API key
+
+| ID | Задача | Оценка | Статус |
+|---|---|---|---|
+| 14.1 | `services/minimax.ts` — 4 функции, OpenAI-compatible | 10 мин | ✅ Done |
+| 14.2 | `services/ai.ts` — `AIProvider` union + `PROVIDER_PRIORITY` | 5 мин | ✅ Done |
+| 14.3 | `services/ai.ts` — `isProviderAvailable('minimax')` с placeholder-gate | 5 мин | ✅ Done |
+| 14.4 | `services/ai.ts` — 4 × 2 switch-arm'а `case 'minimax':` | 5 мин | ✅ Done |
+| 14.5 | `App.tsx` — Settings radio + modal text | 2 мин | ✅ Done |
+| 14.6 | `.env` + `key/.env.local` — placeholder `MINIMAX_REPLACE_ME_BEFORE_DEPLOY` | 1 мин | ✅ Done |
+| 14.7 | OpenSpec change `MiniMax-provider-integration` → archived | 10 мин | ✅ Done |
+| 14.8 | Main spec `openspec/specs/ai-services/spec.md` synced | 5 мин | ✅ Done |
+| 14.9 | CHANGELOG.md + audit/004 + tasks/014 docs | 10 мин | ✅ Done |
+| 14.10 | **Получить реальный MiniMax API ключ** (https://platform.minimax.io/usercenter/basic-information/keys) | — мин | ⛔ User pending |
+| 14.11 | Заменить placeholder на реальный ключ в `.env` и `key/.env.local` через `sed -i 's|^VITE_MINIMAX_API_KEY=.*|VITE_MINIMAX_API_KEY=<real>|'` | 1 мин | ⛔ Pending |
+| 14.12 | Smoke-test: `curl -H "Authorization: Bearer $KEY" https://api.minimax.io/v1/models` → 200 | 10 сек | ⛔ Pending |
+| 14.13 | `npm run build` → sync `dist/` → `docker build -t root-med-proxy` → recreate `med-proxy` | ~3 мин | ⛔ Pending |
+| 14.14 | Chrome hard-refresh + UI smoke | 1 мин | ⛔ Pending |
+
+## Почему уже сейчас можно коммитить
+
+Все шаги 14.1-14.9 безопасны — заглушка ловится в **двух местах**:
+- `services/minimax.ts#isMinimaxConfigured()`: `if (trimmed.startsWith('MINIMAX_REPLACE_ME')) return false;`
+- `services/ai.ts#isProviderAvailable('minimax')`: такой же short-circuit.
+
+Если код вызывается до замены ключа — **никакого HTTP-запроса к MiniMax не происходит**.
+Запись в `.env` остаётся placeholder, и пользователь видит ту же ситуацию, что была до этого change.
+
+## ⚠️ Нюанс приоритета (напоминание для следующего цикла)
+
+`PROVIDER_PRIORITY = ['mistral', 'MiniMax', 'gemini', 'ollama']`. Если решение
+«Mistral первым» перестанет устраивать — поправить одну строку в
+`services/ai.ts:24`. См. полное обсуждение в `audit/004 §6`.
+
+## Чеклист пользователя
+
+Когда MiniMax-ключ будет готов, выполните:
+```bash
+# 1) ключ через секретный канал (НЕ через чат)
+set -a; source ~/.MiniMax_key   # ваш файл с chmod 600
+set +a
+
+# 2) заменить заглушку (на диске)
+sed -i 's|^VITE_MINIMAX_API_KEY=.*|VITE_MINIMAX_API_KEY='"$VITE_MINIMAX_API_KEY"'|' .env
+sed -i 's|^VITE_MINIMAX_API_KEY=.*|VITE_MINIMAX_API_KEY='"$VITE_MINIMAX_API_KEY"'|' key/.env.local
+
+# 3) deploy
+npm run build
+rsync -a --delete dist/ /root/med-proxy/dist/
+(cd /root/med-proxy && docker build -t root-med-proxy .)
+docker rm -f med-proxy && docker compose up -d med-proxy
+```
+
+Скажите «деплой» — выполню шаги 3.

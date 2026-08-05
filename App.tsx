@@ -9,7 +9,7 @@ function App() {
   const [pubmedApiKey, setPubmedApiKey] = useState('');
   const [showSettings, setShowSettings] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
-  const [selectedAIProvider, setSelectedAIProvider] = useState<'ollama' | 'gemini' | 'mistral'>('ollama');
+  const [selectedAIProvider, setSelectedAIProvider] = useState<'ollama' | 'gemini' | 'mistral' | 'minimax'>('ollama');
   
   const [searchState, setSearchState] = useState<SearchState>({
     query: '',
@@ -31,13 +31,13 @@ function App() {
   }, [isDarkMode]);
 
   useEffect(() => {
-    const stored = localStorage.getItem('selectedAIProvider') as 'ollama' | 'gemini' | 'mistral' | null;
+    const stored = localStorage.getItem('selectedAIProvider') as 'ollama' | 'gemini' | 'mistral' | 'minimax' | null;
     if (stored) {
       setSelectedAIProvider(stored);
     }
   }, []);
 
-  const handleAIProviderChange = (provider: 'ollama' | 'gemini' | 'mistral') => {
+  const handleAIProviderChange = (provider: 'ollama' | 'gemini' | 'mistral' | 'minimax') => {
     setSelectedAIProvider(provider);
     localStorage.setItem('selectedAIProvider', provider);
   };
@@ -220,6 +220,17 @@ function App() {
                         />
                         <span className="text-sm text-gray-700 dark:text-gray-300">Mistral (бесплатный)</span>
                      </label>
+                     <label className="flex items-center">
+                        <input
+                           type="radio"
+                           name="aiProvider"
+                           value="minimax"
+                           checked={selectedAIProvider === 'minimax'}
+                           onChange={(e) => handleAIProviderChange(e.target.value as 'minimax')}
+                           className="mr-2 text-indigo-600 focus:ring-indigo-500"
+                        />
+                        <span className="text-sm text-gray-700 dark:text-gray-300">MiniMax (M2.7-highspeed)</span>
+                     </label>
                   </div>
                </div>
             </div>
@@ -391,7 +402,7 @@ function App() {
               </h3>
             </div>
             <p className="text-gray-600 dark:text-gray-300 mb-6">
-              Ни один из AI-провайдеров (Ollama, Gemini, Mistral) не доступен.
+              Ни один из AI-провайдеров (Mistral, MiniMax, Gemini, Ollama) не доступен.
               Проверьте настройки подключения и API ключи для облачных сервисов.
             </p>
             <div className="flex gap-3">
