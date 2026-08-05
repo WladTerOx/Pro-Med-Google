@@ -7,6 +7,7 @@ import ReactMarkdown from 'react-markdown';
 interface Props {
   article: PubMedArticle;
   onClose: () => void;
+  onAIError: () => void;
 }
 
 const MarkdownRenderer = ({ text }: { text: string }) => {
@@ -31,7 +32,7 @@ const MarkdownRenderer = ({ text }: { text: string }) => {
   );
 };
 
-export const ArticleModal: React.FC<Props> = ({ article, onClose }) => {
+export const ArticleModal: React.FC<Props> = ({ article, onClose, onAIError }) => {
   const [summary, setSummary] = useState<string>('');
   const [loading, setLoading] = useState(true);
 
@@ -47,10 +48,23 @@ export const ArticleModal: React.FC<Props> = ({ article, onClose }) => {
           return;
       }
 
-      const result = await summarizeArticleForLayperson(article.title, article.abstract);
-      if (mounted) {
-        setSummary(result);
-        setLoading(false);
+      try {
+        const result = await summarizeArticleForLayperson(article.title, article.abstract);
+        if (mounted) {
+          setSummary(result);
+          setLoading(false);
+        }
+      } catch (error: any) {
+        if (error.message === 'ALL_AI_PROVIDERS_UNAVAILABLE') {
+          onAIError();
+          onClose(); // Close the article modal
+        } else {
+          // Handle other errors
+          if (mounted) {
+            setSummary('Произошла ошибка при обработке статьи. Попробуйте позже.');
+            setLoading(false);
+          }
+        }
       }
     };
 

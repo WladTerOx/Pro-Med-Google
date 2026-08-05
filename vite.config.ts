@@ -9,24 +9,26 @@ export default defineConfig(({ mode }) => {
         server: {
             port: 3009,
             host: '0.0.0.0',
-            allowedHosts: true,
+            //allowedHosts: true,
+	    allowedHosts: ['med.openaiua.cloud'],
             proxy: {
                 '/api/ollama': {
                     target: env.VITE_OLLAMA_BASE_URL || 'http://192.168.50.250:11434',
                     changeOrigin: true,
                     secure: false,
                     rewrite: (path) => path.replace(/^\/api\/ollama/, ''),
-                    configure: (proxy) => {
-                        proxy.on('proxyReq', (proxyReq) => {
-                            proxyReq.removeHeader('origin')
-                            proxyReq.removeHeader('referer')
-                        })
-                        proxy.on('proxyRes', (proxyRes) => {
-                            proxyRes.headers['Access-Control-Allow-Origin'] = '*'
-                            proxyRes.headers['Access-Control-Allow-Headers'] = '*'
-                            proxyRes.headers['Access-Control-Allow-Methods'] = 'GET,POST,OPTIONS'
-                        })
-                    },
+                     configure: (proxy, options) => {
+                         proxy.on('proxyReq', (proxyReq, req) => {
+                             proxyReq.removeHeader('origin')
+                             proxyReq.removeHeader('referer')
+                             const origin = req.headers.origin;
+                             proxy.on('proxyRes', (proxyRes) => {
+                                 proxyRes.headers['Access-Control-Allow-Origin'] = origin || '*'
+                                 proxyRes.headers['Access-Control-Allow-Headers'] = '*'
+                                 proxyRes.headers['Access-Control-Allow-Methods'] = 'GET,POST,OPTIONS'
+                             });
+                         })
+                     },
                 },
             },
         },

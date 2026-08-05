@@ -66,9 +66,9 @@
    Отредактируйте файл `.env.local`:
 
    ```env
-   # Ollama Configuration (Local AI)
-   VITE_OLLAMA_BASE_URL=http://192.168.50.64:11434
-   VITE_OLLAMA_MODEL=gpt-oss:20b-cloud
+    # Ollama Configuration (Local AI)
+    VITE_OLLAMA_BASE_URL=http://192.168.50.250:11434
+    VITE_OLLAMA_MODEL=gpt-oss:20b-cloud
 
    # Optional: PubMed API Key для увеличения лимитов запросов
    GEMINI_API_KEY=your_key_here
@@ -94,8 +94,45 @@
 
 7. **Откройте в браузере:**
    ```
-   http://localhost:3009
+    http://localhost:3009
+    ```
+
+## 🐳 Production Deployment
+
+Для production-развёртывания с Docker, Traefik и pm2:
+
+### Предварительные требования
+- Docker и Docker Compose
+- Traefik с SSL-сертификатами
+- WireGuard VPN для доступа к Ollama
+- pm2 для управления процессами
+
+### Настройка
+1. **Соберите проект:**
+   ```bash
+   npm run build
    ```
+
+2. **Настройте Docker Compose:**
+   Убедитесь, что `docker-compose.yml` в `/root` включает сервис med-proxy.
+
+3. **Запустите с pm2:**
+   ```bash
+   pm2 start ecosystem.config.js
+   pm2 save
+   ```
+
+4. **Доступ:**
+   - Frontend: https://med.openaiua.cloud (через Traefik)
+   - Ollama: Через WireGuard на 192.168.50.250:11434
+
+### Настройка WireGuard
+- Подключитесь к VPN для доступа к Ollama.
+- Убедитесь, что Ollama сервер запущен на удалённой машине.
+
+### Мониторинг
+- `pm2 monit` для мониторинга процессов
+- `docker-compose logs` для логов контейнеров
 
 ## 📖 Использование
 

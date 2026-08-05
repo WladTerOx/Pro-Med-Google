@@ -20,6 +20,7 @@ function App() {
   });
 
   const [selectedArticle, setSelectedArticle] = useState<PubMedArticle | null>(null);
+  const [showAIErrorModal, setShowAIErrorModal] = useState(false);
 
   useEffect(() => {
     if (isDarkMode) {
@@ -92,11 +93,20 @@ function App() {
       }
 
     } catch (err: any) {
-      setSearchState(prev => ({
-        ...prev,
-        loading: false,
-        error: err.message || 'Произошла ошибка при поиске'
-      }));
+      if (err.message === 'ALL_AI_PROVIDERS_UNAVAILABLE') {
+        setShowAIErrorModal(true);
+        setSearchState(prev => ({
+          ...prev,
+          loading: false,
+          error: null // Don't show error in results when modal is shown
+        }));
+      } else {
+        setSearchState(prev => ({
+          ...prev,
+          loading: false,
+          error: err.message || 'Произошла ошибка при поиске'
+        }));
+      }
     }
   };
 
@@ -360,12 +370,49 @@ function App() {
         </div>
       </main>
 
-      {/* Modal */}
+      {/* Modals */}
       {selectedArticle && (
-        <ArticleModal 
-          article={selectedArticle} 
-          onClose={() => setSelectedArticle(null)} 
+        <ArticleModal
+          article={selectedArticle}
+          onClose={() => setSelectedArticle(null)}
+          onAIError={() => setShowAIErrorModal(true)}
         />
+      )}
+
+      {showAIErrorModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 max-w-md w-full shadow-xl">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 bg-red-100 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-full flex items-center justify-center">
+                <XCircleIcon className="w-6 h-6" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                AI недоступен
+              </h3>
+            </div>
+            <p className="text-gray-600 dark:text-gray-300 mb-6">
+              Ни один из AI-провайдеров (Ollama, Gemini, Mistral) не доступен.
+              Проверьте настройки подключения и API ключи для облачных сервисов.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  setShowAIErrorModal(false);
+                  setShowSettings(true);
+                }}
+                className="flex-1 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium transition-colors"
+              >
+                Настроить
+              </button>
+              <button
+                onClick={() => setShowAIErrorModal(false)}
+                className="px-4 py-2 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 rounded-lg font-medium transition-colors"
+              >
+                Закрыть
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

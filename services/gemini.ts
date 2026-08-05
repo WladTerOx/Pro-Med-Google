@@ -12,7 +12,7 @@ const ai = new GoogleGenAI({ apiKey: apiKey || 'dummy-key-to-prevent-crash-if-mi
  * Translates a search query from Russian (or any language) to English for PubMed.
  */
 export const translateQueryToEnglish = async (query: string): Promise<string> => {
-  if (!apiKey) return query;
+  if (!apiKey) throw new Error('Gemini API key is missing');
 
   try {
     const model = 'gemini-2.5-flash';
@@ -29,8 +29,7 @@ export const translateQueryToEnglish = async (query: string): Promise<string> =>
 
     return response.text?.trim() || query;
   } catch (error) {
-    console.error("Query translation error:", error);
-    return query;
+    throw error; // Re-throw to trigger fallback
   }
 };
 
@@ -38,7 +37,8 @@ export const translateQueryToEnglish = async (query: string): Promise<string> =>
  * Translates a list of titles to Russian using Gemini.
  */
 export const translateTitlesToRussian = async (titles: string[]): Promise<string[]> => {
-  if (!apiKey || titles.length === 0) return titles;
+  if (!apiKey) throw new Error('Gemini API key is missing');
+  if (titles.length === 0) return titles;
 
   try {
     const model = 'gemini-2.5-flash';
@@ -68,7 +68,7 @@ export const translateTitlesToRussian = async (titles: string[]): Promise<string
     return titles;
   } catch (error) {
     console.error("Translation error:", error);
-    return titles; // Fallback to original
+    throw error; // Re-throw to trigger fallback
   }
 };
 
@@ -103,7 +103,7 @@ export const summarizeArticleForLayperson = async (title: string, abstract: stri
     return response.text || "Не удалось создать краткое содержание.";
   } catch (error) {
     console.error("Summarization error:", error);
-    return "Произошла ошибка при генерации описания.";
+    throw error; // Re-throw to trigger fallback
   }
 };
 
@@ -111,7 +111,7 @@ export const summarizeArticleForLayperson = async (title: string, abstract: stri
  * Optimizes a long query into concise PubMed-compatible search terms using Gemini.
  */
 export const optimizeQueryForPubMed = async (longQuery: string): Promise<string> => {
-  if (!apiKey) return longQuery;
+  if (!apiKey) throw new Error('Gemini API key is missing');
 
   try {
     const model = 'gemini-2.5-flash';
@@ -135,6 +135,6 @@ export const optimizeQueryForPubMed = async (longQuery: string): Promise<string>
     return response.text?.trim() || longQuery;
   } catch (error) {
     console.error("Query optimization error:", error);
-    return longQuery;
+    throw error; // Re-throw to trigger fallback
   }
 };

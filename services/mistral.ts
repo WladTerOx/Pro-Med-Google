@@ -5,7 +5,7 @@
 
 // Mistral configuration
 const MISTRAL_BASE_URL = 'https://api.mistral.ai/v1/chat/completions';
-const MISTRAL_MODEL = 'mistral-tiny';
+const MISTRAL_MODEL = 'mistral-small-latest';
 const apiKey = import.meta.env.VITE_MISTRAL_API_KEY;
 
 /**
@@ -58,7 +58,7 @@ const mistralRequest = async (messages: Array<{role: string, content: string}>):
  */
 export const translateQueryToEnglish = async (query: string): Promise<string> => {
   if (!isMistralConfigured()) {
-    return query;
+    throw new Error('Mistral API key is missing');
   }
 
   try {
@@ -77,7 +77,7 @@ export const translateQueryToEnglish = async (query: string): Promise<string> =>
     return response.trim() || query;
   } catch (error) {
     console.error("Mistral query translation error:", error);
-    return query;
+    throw error; // Re-throw to trigger fallback
   }
 };
 
@@ -86,7 +86,7 @@ export const translateQueryToEnglish = async (query: string): Promise<string> =>
  */
 export const translateTitlesToRussian = async (titles: string[]): Promise<string[]> => {
   if (!isMistralConfigured() || titles.length === 0) {
-    return titles;
+    throw new Error('Mistral API key is missing');
   }
 
   try {
@@ -112,7 +112,7 @@ export const translateTitlesToRussian = async (titles: string[]): Promise<string
     return translatedTitles;
   } catch (error) {
     console.error("Mistral title translation error:", error);
-    return titles;
+    throw error; // Re-throw to trigger fallback
   }
 };
 
@@ -121,7 +121,7 @@ export const translateTitlesToRussian = async (titles: string[]): Promise<string
  */
 export const summarizeArticleForLayperson = async (title: string, abstract: string): Promise<string> => {
   if (!isMistralConfigured()) {
-    return "Ключ Mistral API не настроен. Проверьте переменную VITE_MISTRAL_API_KEY.";
+    throw new Error('Mistral API key is missing');
   }
 
   try {
@@ -151,7 +151,7 @@ Abstract: ${abstract}`
     return response || "Не удалось создать краткое содержание.";
   } catch (error) {
     console.error("Mistral summarization error:", error);
-    return "Произошла ошибка при генерации описания.";
+    throw error; // Re-throw to trigger fallback
   }
 };
 
@@ -160,7 +160,7 @@ Abstract: ${abstract}`
  */
 export const optimizeQueryForPubMed = async (longQuery: string): Promise<string> => {
   if (!isMistralConfigured()) {
-    return longQuery;
+    throw new Error('Mistral API key is missing');
   }
 
   try {
@@ -188,12 +188,12 @@ Rules:
 
     // Validate the response
     if (optimized.length > 300) {
-      return longQuery; // Fallback to original if too long
+      throw new Error('Optimized query too long');
     }
 
     return optimized || longQuery;
   } catch (error) {
     console.error("Mistral query optimization error:", error);
-    return longQuery;
+    throw error; // Re-throw to trigger fallback
   }
 };

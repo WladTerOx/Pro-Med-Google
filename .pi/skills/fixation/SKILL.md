@@ -1,0 +1,77 @@
+---
+name: fixation
+description: End-of-task fixation ritual for the Pro-Med-Google project. Use when the user says "фиксация", "фиксируем", "зафиксируй" or asks to close out a task. Performs 5 steps: archive OpenSpec change if exists, write summary/audit/<NNN>.md, write summary/tasks/<NNN>.md, append to CHANGELOG.md, commit and push.
+---
+
+# Фиксация (Fixation)
+
+**Фиксация** — стандартная процедура полного закрытия и документирования любой задачи. Обязательна для всех мутирующих задач.
+
+## Процедура (5 шагов)
+
+### 1. OpenSpec Change (если задача затрагивает код/спек)
+
+Если есть незаархивированный change в `openspec/changes/`:
+1. Проверить статус: `openspec status --change <name> --json`
+2. Синхронизировать delta specs в main specs (если есть)
+3. Архивировать: переместить в `openspec/changes/archive/YYYY-MM-DD-<name>/`
+
+### 2. Аудит в `summary/audit/`
+
+Создать файл: `summary/audit/<NNN>_<slug>.md`
+
+```markdown
+# Аудит: <тема>
+
+## 1. Контекст
+## 2. Что сделано
+## 3. Статус
+```
+
+### 3. Задачи в `summary/tasks/`
+
+Создать/обновить: `summary/tasks/<NNN>_<slug>.md`
+
+```markdown
+# Задачи: <тема>
+
+## Статус: ✅ Done
+
+| ID | Задача | Оценка | Статус |
+|---|---|---|---|
+| 1 | ... | ... | ✅ Done |
+```
+
+### 4. CHANGELOG
+
+Добавить в конец `CHANGELOG.md` краткую запись с ISO-8601 timestamp. Записи ведутся по нарастающей, от ранних к поздним. Секреты и содержимое `.env` не включать.
+
+### 5. Git Commit
+
+```bash
+git add <все файлы задачи>
+git commit -m "<type>: <description>"
+git push  # если есть remote
+```
+
+## Объём фиксации
+
+| Что | Где |
+|-----|-----|
+| Аудит (что сделано, выводы) | `summary/audit/` |
+| Задачи (план, статус) | `summary/tasks/` |
+| OpenSpec change | `openspec/changes/` → `archive/` |
+| OpenSpec specs | `openspec/specs/` |
+| Хронология изменений | `CHANGELOG.md` |
+| Код/скрипты | проект |
+| Git | commit + push |
+
+## Признак завершения
+
+1. ✅ Все 5 шагов пройдены
+2. ✅ Git clean (только файлы задачи закоммичены)
+3. ✅ `git status` — нет незакоммиченных изменений
+
+## Активация
+
+Скажи агенту: **"фиксируем"**, **"фиксация"**, **"зафиксируй"**
