@@ -37,6 +37,14 @@ const getSelectedProvider = (): AIProvider => {
 const isProviderAvailable = async (provider: AIProvider): Promise<boolean> => {
   switch (provider) {
     case 'ollama':
+      // Ops-toggle: VITE_OLLAMA_DISABLED=true short-circuits the probe so a
+      // dead host can be muted without code edits. Default is "enabled".
+      // See openspec/specs/ai-services/spec.md scenario "Ollama host
+      // disabled via env" for the contract.
+      if (String(import.meta.env.VITE_OLLAMA_DISABLED).trim() === 'true') {
+        console.log('Ollama disabled via VITE_OLLAMA_DISABLED');
+        return false;
+      }
       return await ollama.checkOllamaConnection();
     case 'gemini':
       console.log('Testing Gemini API...');

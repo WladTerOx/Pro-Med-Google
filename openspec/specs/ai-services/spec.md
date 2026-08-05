@@ -49,9 +49,11 @@ subsequent operations on the same page do not re-check availability.
 
 ### Requirement: Provider availability test
 
-The system SHALL test provider availability before using it. The test MUST
-differentiate between "configured but exhausted" and "not configured",
-and it MUST support MiniMax identically to the other cloud providers.
+The system SHALL test provider availability before using it. The test
+MUST differentiate between "configured but exhausted" and "not
+configured", and it MUST support MiniMax identically to the other
+cloud providers. Ollama MAY be disabled via an env-driven toggle
+(`VITE_OLLAMA_DISABLED=true`) without code edits.
 
 #### Scenario: Mistral key present and credits available
 - **WHEN** `VITE_MISTRAL_API_KEY` is set and `GET https://api.mistral.ai/v1/models` returns 200
@@ -77,6 +79,19 @@ and it MUST support MiniMax identically to the other cloud providers.
 - **WHEN** `VITE_MINIMAX_API_KEY` is empty or absent
 - **THEN** MiniMax is treated as unavailable and skipped without any
   network probe
+
+#### Scenario: Ollama disabled via env
+- **WHEN** `VITE_OLLAMA_DISABLED` is the literal string `'true'` (after
+  trimming whitespace)
+- **THEN** `isProviderAvailable('ollama')` returns `false` immediately
+  without contacting `/api/ollama/api/tags`, and the orchestrator logs
+  a single line indicating the toggle is in effect
+
+#### Scenario: Ollama probe returns true
+- **WHEN** `VITE_OLLAMA_DISABLED` is not `'true'` and the host
+  reachable at `VITE_OLLAMA_BASE_URL` responds with HTTP 200 to
+  `GET /api/tags` via the configured proxy
+- **THEN** Ollama is treated as available and used for AI operations
 
 ### Requirement: Provider operations throw on failure
 
