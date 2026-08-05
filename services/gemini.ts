@@ -15,7 +15,7 @@ export const translateQueryToEnglish = async (query: string): Promise<string> =>
   if (!apiKey) throw new Error('Gemini API key is missing');
 
   try {
-    const model = 'gemini-2.5-flash';
+    const model = 'gemini-flash-latest';
     const prompt = `Translate the following medical search query into English for a PubMed database search. 
     If the query is already in English, return it exactly as is.
     Return ONLY the English translation, no other text or explanation.
@@ -41,7 +41,7 @@ export const translateTitlesToRussian = async (titles: string[]): Promise<string
   if (titles.length === 0) return titles;
 
   try {
-    const model = 'gemini-2.5-flash';
+    const model = 'gemini-flash-latest';
     const prompt = `Translate the following medical article titles from English to Russian. 
     Return ONLY a JSON array of strings corresponding to the order of the input.
     Input: ${JSON.stringify(titles)}`;
@@ -79,7 +79,7 @@ export const summarizeArticleForLayperson = async (title: string, abstract: stri
   if (!apiKey) return "API Key is missing. Cannot generate summary.";
 
   try {
-    const model = 'gemini-2.5-flash';
+    const model = 'gemini-flash-latest';
     const prompt = `You are a helpful medical assistant. 
     Your task is to explain the following medical scientific article to a simple person (non-medical expert) in Russian.
     
@@ -114,7 +114,7 @@ export const optimizeQueryForPubMed = async (longQuery: string): Promise<string>
   if (!apiKey) throw new Error('Gemini API key is missing');
 
   try {
-    const model = 'gemini-2.5-flash';
+    const model = 'gemini-flash-latest';
     const prompt = `You are a medical research assistant. Your task is to optimize long, detailed queries into concise PubMed search terms. Focus on the core medical concepts, diseases, treatments, and key terms that would yield the best search results.
     
     Please optimize this medical query for PubMed search. Extract the key medical terms, diseases, treatments, and concepts. Make it concise but comprehensive.

@@ -46,7 +46,7 @@ const isProviderAvailable = async (provider: AIProvider): Promise<boolean> => {
         const { GoogleGenAI } = await import('@google/genai');
         const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_API_KEY });
         await ai.models.generateContent({
-          model: 'gemini-2.5-flash',
+          model: 'gemini-flash-latest',
           contents: 'Hello',
         });
         return true;

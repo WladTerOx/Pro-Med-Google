@@ -65,7 +65,20 @@ const MiniMaxRequest = async (messages: Array<{role: string, content: string}>):
     }
 
     const data = await response.json();
-    return data.choices?.[0]?.message?.content || '';
+    const raw = data.choices?.[0]?.message?.content || '';
+    // MiniMax-M3 / M2.7 always wrap their answer in a thinking-the-answer
+    // reasoning block. The MiniMax API does not let us disable it via the
+    // `thinking` parameter (returns HTTP 400), so we strip the block at
+    // the client side before the orchestrator sees the result.
+    // Patterns covered: well-formed closed block AND unterminated block
+    // (model occasionally runs out of tokens before closing it).
+    const thinkOpen = String.fromCharCode(60, 116, 104, 105, 110, 107, 62); // '<think>'
+    const thinkClose = String.fromCharCode(60, 47, 116, 104, 105, 110, 107, 62); // '</think>'
+    const stripped = raw
+      .replace(new RegExp(`${thinkOpen}[\\s\\S]*?${thinkClose}`, 'g'), '')
+      .replace(new RegExp(`${thinkOpen}[\\s\\S]*$`, 'g'), '')
+      .trim();
+    return stripped || raw;
   } catch (error) {
     console.error('MiniMax request error:', error);
     throw error;
