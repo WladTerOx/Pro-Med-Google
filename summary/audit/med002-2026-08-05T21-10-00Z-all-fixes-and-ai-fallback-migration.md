@@ -2,7 +2,7 @@
 
 **Дата:** 2026-08-05 21:10 UTC
 **Автор:** pi-coding-agent (по запросу пользователя — `A/C/D/E` из аудит-сессии)
-**Связано с:** [`audit/001`](./001-2026-08-05T19-31-33Z-all-ai-keys-broken.md), OpenSpec change
+**Связано с:** [`audit/med001`](./med001-2026-08-05T19-31-33Z-all-ai-keys-broken.md), OpenSpec change
 `ai-fallback-chain-migration` → `openspec/changes/archive/2026-08-05-ai-fallback-chain-migration/`
 **Scope:** все 11 запланированных задач (`summary/tasks/001–011`) + новая миграция на fallback AI.
 
@@ -193,8 +193,8 @@ favicon.ico
 openspec/specs/ai-services/spec.md
 openspec/changes/archive/2026-08-05-ai-fallback-chain-migration/{proposal,design,tasks}.md
 openspec/changes/archive/2026-08-05-ai-fallback-chain-migration/specs/ai-services/spec.md
-summary/audit/001-2026-08-05T19-31-33Z-all-ai-keys-broken.md
-summary/audit/002-2026-08-05T21-10-00Z-all-fixes-and-ai-fallback-migration.md  ← этот файл
+summary/audit/med001-2026-08-05T19-31-33Z-all-ai-keys-broken.md
+summary/audit/med002-2026-08-05T21-10-00Z-all-fixes-and-ai-fallback-migration.md  ← этот файл
 summary/tasks/001-...md  …  011-...md                                          (11 файлов)
 
 # Generated в этой фиксации (после `git add`)

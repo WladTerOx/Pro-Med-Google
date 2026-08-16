@@ -2,9 +2,9 @@
 
 **Дата:** 2026-08-05 22:15 UTC
 **Автор:** pi-coding-agent (по запросу пользователя, «заглуши пока ollama»)
-**Связано с:** [audit/001](./001-2026-08-05T19-31-33Z-all-ai-keys-broken.md),
-[audit/002](./002-2026-08-05T21-10-00Z-all-fixes-and-ai-fallback-migration.md),
-[tasks/008](../tasks/008-2026-08-05T20-47-38Z-ollama-host-investigation.md),
+**Связано с:** [audit/med001](./med001-2026-08-05T19-31-33Z-all-ai-keys-broken.md),
+[audit/med002](./med002-2026-08-05T21-10-00Z-all-fixes-and-ai-fallback-migration.md),
+[tasks/med001.8](../tasks/med001.8-2026-08-05T20-47-38Z-ollama-host-investigation.md),
 [tasks/011](../tasks/011-2026-08-05T20-47-38Z-remove-hardcoded-ollama-fallback.md),
 [tasks/012](../tasks/012-2026-08-05T21-10-00Z-fix-uncompleted-from-001-011.md) §12.6.
 OpenSpec change `ollama-disable-toggle` →

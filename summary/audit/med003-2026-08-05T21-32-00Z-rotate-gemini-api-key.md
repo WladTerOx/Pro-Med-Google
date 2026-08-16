@@ -3,15 +3,15 @@
 **Дата:** 2026-08-05 21:32 UTC
 **Автор:** pi-coding-agent (по запросу пользователя)
 **Severity:** 🟡 низкий (рутинная операция, без простоя; требует ребилда для доставки в прод)
-**Связано с:** [`audit/001`](./001-2026-08-05T19-31-33Z-all-ai-keys-broken.md) (тогда ключ
-помечен как «исчерпан по prepay»; [`audit/002`](./002-2026-08-05T21-10-00Z-all-fixes-and-ai-fallback-migration.md)
+**Связано с:** [`audit/med001`](./med001-2026-08-05T19-31-33Z-all-ai-keys-broken.md) (тогда ключ
+помечен как «исчерпан по prepay»; [`audit/med002`](./med002-2026-08-05T21-10-00Z-all-fixes-and-ai-fallback-migration.md)
 (миграция на fallback chain, где Gemini теперь второй приоритет после Ollama).
 
 ---
 
 ## 1. Контекст
 
-В [`audit/001`](./001-2026-08-05T19-31-33Z-all-ai-keys-broken.md) был зафиксирован
+В [`audit/med001`](./med001-2026-08-05T19-31-33Z-all-ai-keys-broken.md) был зафиксирован
 `RESOURCE_EXHAUSTED` для существующего ключа `AIzaSy...g9Qs` —
 prepay-кредиты исчерпаны. Ollama тогда тоже был недоступен, и единственным
 рабочим провайдером остался Mistral (ключ `5YZeG3...UnWz`, заменённый там же).
@@ -72,7 +72,7 @@ prepay-кредиты исчерпаны. Ollama тогда тоже был не
 | 5 | В браузере открыть `https://med.openaiua.cloud` через Ctrl+Shift+R | клиент |
 
 После шагов 1-5 — Gemini снова доступен в `findAvailableProvider()` вторым
-после Ollama, как задокументировано в [`audit/002`](./002-2026-08-05T21-10-00Z-all-fixes-and-ai-fallback-migration.md)
+после Ollama, как задокументировано в [`audit/med002`](./med002-2026-08-05T21-10-00Z-all-fixes-and-ai-fallback-migration.md)
 и `openspec/specs/ai-services/spec.md` (§ «Provider priority chain», сценарий
 «First two providers unavailable»).
 
@@ -105,7 +105,7 @@ prepay-кредиты исчерпаны. Ollama тогда тоже был не
 key/.env.local                        ← VITE_API_KEY=…
 
 # создано в этой фиксации (как файлы, без git commit)
-summary/audit/003-2026-08-05T21-32-00Z-rotate-gemini-api-key.md  ← этот файл
+summary/audit/med003-2026-08-05T21-32-00Z-rotate-gemini-api-key.md  ← этот файл
 summary/tasks/013-2026-08-05T21-32-00Z-rotate-gemini-api-key.md  ← минимальный checklist
 CHANGELOG.md                         ← +1 entry
 ```

@@ -2,8 +2,8 @@
 
 **Дата:** 2026-08-05 21:46 UTC
 **Автор:** pi-coding-agent (по запросу пользователя)
-**Связано с:** [audit/002](./002-2026-08-05T21-10-00Z-all-fixes-and-ai-fallback-migration.md)
-(трёхпровайдерный fallback), [audit/003](./003-2026-08-05T21-32-00Z-rotate-gemini-api-key.md)
+**Связано с:** [audit/med002](./med002-2026-08-05T21-10-00Z-all-fixes-and-ai-fallback-migration.md)
+(трёхпровайдерный fallback), [audit/med003](./med003-2026-08-05T21-32-00Z-rotate-gemini-api-key.md)
 (свежий Gemini-ключ), OpenSpec change `MiniMax-provider-integration` →
 `openspec/changes/archive/2026-08-05-minimax-provider-integration/`.
 
@@ -145,7 +145,7 @@ openspec/changes/archive/2026-08-05-minimax-provider-integration/
 ├─ specs/ai-services/spec.md
 └─ .openspec.yaml
 
-summary/audit/004-2026-08-05T21-46-00Z-add-MiniMax-provider-integration.md   ← этот файл
+summary/audit/med004-2026-08-05T21-46-00Z-add-MiniMax-provider-integration.md   ← этот файл
 summary/tasks/014-2026-08-05T21-46-00Z-add-MiniMax-provider-integration.md   ← checklist
 
 # Out of repo (.gitignore): изменены (но НЕ коммитятся)
